@@ -1,0 +1,48 @@
+# Build output
+target/
+build/
+out/
+*.class
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env / secrets — never commit real secrets
+.env
+.env.*
+!.env.example
+application-local.yml
+application-secrets.yml
+
+# Docker
+docker-compose.override.yml
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Node (if any tooling scripts use it)
+node_modules/
