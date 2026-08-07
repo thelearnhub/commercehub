@@ -1,0 +1,23 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: commercehub-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - commercehub-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+# Redis, Kafka (KRaft), Schema Registry, Jaeger, Prometheus, Grafana, Loki
+# get added here as the services that need them come online — see
+# docs/CommerceHub_Master_Plan.md Section 4 for the full target list.
+
+volumes:
+  commercehub-mysql-data:
