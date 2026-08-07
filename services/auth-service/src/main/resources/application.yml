@@ -1,0 +1,50 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/commercehub_auth?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+
+  jpa:
+    hibernate:
+      # Flyway owns schema changes — Hibernate must never auto-generate DDL.
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+security:
+  google:
+    # From Google Cloud Console -> APIs & Services -> Credentials.
+    # Same value goes into commercehub-web's VITE_GOOGLE_CLIENT_ID.
+    # The Client ID isn't secret (unlike a client_secret, which this app
+    # never uses), so a real default here is fine for local dev — you can
+    # still override it with the GOOGLE_CLIENT_ID env var in other environments.
+    client-id: ${GOOGLE_CLIENT_ID:707920993135-ohpmm2qgfd7j2pkh7fbj5cv3em69hu3a.apps.googleusercontent.com}
+  jwt:
+    # Never commit a real secret. Set JWT_SECRET as an environment variable
+    # locally and as a Secrets Manager entry in deployed environments.
+    secret: ${JWT_SECRET:dev-only-secret-change-me-before-any-real-deployment-32chars+}
+    access-token-ttl-seconds: 900       # 15 minutes
+    refresh-token-ttl-seconds: 604800   # 7 days
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
