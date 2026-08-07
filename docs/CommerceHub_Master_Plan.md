@@ -227,6 +227,12 @@ Mutation testing and full chaos tooling are the two items most likely to be cut 
 
 **Security (Phase 3):** OAuth2 + OIDC (authorization code + PKCE), refresh token rotation. Service-to-service mTLS (implemented via Istio as a Phase 6 stretch goal). Secrets rotation, encryption at rest (RDS/KMS) and in transit. OWASP Top 10 applied directly to Gateway/Auth: deliberately introduce and fix one SQL injection, one XSS, one CSRF, one CORS misconfiguration — same break-it-first approach as performance. Gateway-level rate limiting, API keys, request size limits.
 
+**Auth hardening backlog (deferred from Phase 1's Google Sign-In work):** the Auth Service built in Phase 1 is intentionally the simple version — one instance, stateless JWTs only, no revocation. Revisit it here, once Eureka/Gateway and multiple services exist to make it worth doing:
+- Redis-backed refresh token store with reuse detection (a reused, already-rotated refresh token kills every session for that user — the standard theft signal).
+- JWKS + key rotation, so downstream services verify JWT signatures locally against a cached public key instead of calling Auth Service on every request — this is what actually lets auth scale past one instance.
+- Explicit account-linking rules for when the same email exists as both a local password account and a Google account (never silently merge on email match alone).
+- MFA / step-up auth for sensitive actions (payments, account changes), even mid-session.
+
 **Kubernetes (Phase 6):** Pods, ReplicaSets, Deployments, Services, Ingress, HPA, StatefulSet (local Kafka/MySQL dev only — production uses managed RDS/MSK), DaemonSet (log shipping), ConfigMap, Secrets, Volumes/PVCs, node affinity, Pod Disruption Budgets, rolling-update tuning tied to the canary/blue-green discussion.
 
 **AWS (Phase 6):** VPC (public/private subnets, NAT gateway), ALB vs NLB, Route53, CloudFront + S3 for product images, Lambda (thumbnail generation on upload), SNS/SQS (fan-out compared against Kafka topics, written as an ADR), MSK vs. self-hosted Kafka, RDS/Aurora, EKS, ECR, IAM least-privilege roles, KMS, Secrets Manager, CloudWatch, X-Ray compared against the existing Jaeger/OTel tracing.
