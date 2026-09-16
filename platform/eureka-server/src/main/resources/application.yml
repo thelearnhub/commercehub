@@ -1,0 +1,22 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    # The registry doesn't register with itself or fetch its own registry.
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
