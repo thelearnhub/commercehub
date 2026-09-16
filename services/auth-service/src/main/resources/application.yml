@@ -21,6 +21,13 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
 security:
   google:
     # From Google Cloud Console -> APIs & Services -> Credentials.
