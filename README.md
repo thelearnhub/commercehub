@@ -6,7 +6,13 @@ Part of the [`thelearnhub`](https://github.com/thelearnhub) org. Full plan: [`do
 
 ## Status
 
-**Phase 0 — Foundations.** Repo scaffolding in progress. See the roadmap in the master plan for what's next.
+**Phase 0 → Phase 1 Transition.**
+- ✅ **Eureka Server** (`platform/eureka-server`) — Service discovery running on port 8761.
+- ✅ **Auth Service** (`services/auth-service`) — JWT authentication, RBAC, Google Sign-In, Flyway migrations, port 8081.
+- ✅ **User Service** (`services/user-service`) — User profiles & addresses, Flyway migrations, DTO mapping, port 8082.
+- ⬜ **Next Up:** `api-gateway`, `config-server`, `product-service`.
+
+See [`AGENTS.md`](AGENTS.md) for full context for AI assistants working on this repo, and [`docs/CommerceHub_Master_Plan.md`](docs/CommerceHub_Master_Plan.md) for the master engineering roadmap.
 
 ## Team & Ownership
 
