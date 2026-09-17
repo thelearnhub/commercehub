@@ -16,7 +16,11 @@ Part of the [`thelearnhub`](https://github.com/thelearnhub) org. Full plan: [`do
 - ✅ **Product Service** (`services/product-service`) — Product catalog, Redis Cache-Aside, Decorator pattern pricing engine, port 8083.
 - ✅ **Cart Service** (`services/cart-service`) — Active shopping carts, Write-Through Redis caching, 7-day TTL expiry, port 8084.
 - ✅ **Inventory Service** (`services/inventory-service`) — Stock reservations, Redis Distributed Lock pattern, Audit Trail history, port 8085.
-- ⬜ **Next Up:** `payment-service`, `order-service`.
+- ✅ **Payment Service** (`services/payment-service`) — Charge & refund flows, Factory & Adapter patterns, Idempotency-Key filter, port 8086.
+- ✅ **Order Service** (`services/order-service`) — Order lifecycle state machine, Checkout Facade pattern, port 8087.
+- ✅ **Shipping Service** (`services/shipping-service`) — Shipment tracking, Observer pattern, State pattern, port 8088.
+- ✅ **Notification Service** (`services/notification-service`) — Email/SMS/Push notifications, Template Method pattern, port 8089.
+- ⬜ **Phase 1 Core Services COMPLETE!** Next: Phase 2 (Kafka Event-Driven Backbone).
 
 See [`AGENTS.md`](AGENTS.md) for full context for AI assistants working on this repo, and [`docs/CommerceHub_Master_Plan.md`](docs/CommerceHub_Master_Plan.md) for the master engineering roadmap.
 
