@@ -22,6 +22,16 @@ spring:
           predicates:
             - Path=/users/**
 
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/products/**
+
+        - id: cart-service
+          uri: lb://cart-service
+          predicates:
+            - Path=/cart/**
+
       globalcors:
         cors-configurations:
           '[/**]':

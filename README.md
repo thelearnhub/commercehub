@@ -14,7 +14,8 @@ Part of the [`thelearnhub`](https://github.com/thelearnhub) org. Full plan: [`do
 - ✅ **Auth Service** (`services/auth-service`) — JWT authentication, RBAC, Google Sign-In, Flyway migrations, port 8081.
 - ✅ **User Service** (`services/user-service`) — User profiles & addresses, Flyway migrations, DTO mapping, port 8082.
 - ✅ **Product Service** (`services/product-service`) — Product catalog, Redis Cache-Aside, Decorator pattern pricing engine, port 8083.
-- ⬜ **Next Up:** `cart-service`, `inventory-service`, `payment-service`, `order-service`.
+- ✅ **Cart Service** (`services/cart-service`) — Active shopping carts, Write-Through Redis caching, 7-day TTL expiry, port 8084.
+- ⬜ **Next Up:** `inventory-service`, `payment-service`, `order-service`.
 
 See [`AGENTS.md`](AGENTS.md) for full context for AI assistants working on this repo, and [`docs/CommerceHub_Master_Plan.md`](docs/CommerceHub_Master_Plan.md) for the master engineering roadmap.
 
