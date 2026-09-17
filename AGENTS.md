@@ -20,19 +20,22 @@ This document serves as the primary context file for AI coding assistants (Antig
 | Module | Location | Port | Status | Capabilities & Details |
 |---|---|---|---|---|
 | **Eureka Server** | `platform/eureka-server` | 8761 | ✅ Complete | Netflix Eureka Service Discovery server. Services register via `@EnableDiscoveryClient`. |
-| **API Gateway** | `platform/api-gateway` | 8080 | ✅ Complete | Spring Cloud Gateway entry point routing `/auth/**` and `/users/**` via Eureka load balancing (`lb://`). Global CORS configured. |
+| **API Gateway** | `platform/api-gateway` | 8080 | ✅ Complete | Spring Cloud Gateway entry point routing `/auth/**`, `/users/**`, `/products/**` via Eureka load balancing (`lb://`). Global CORS configured. |
+| **Config Server** | `platform/config-server` | 8888 | ✅ Complete | Centralized Spring Cloud Config Server with native profile search locations for microservice configurations. |
+| **Common Security** | `libs/common-security` | — | ✅ Complete | Shared library module providing reusable `JwtService` parse-only validator and `JwtAuthenticationFilter` across downstream microservices. |
 | **Auth Service** | `services/auth-service` | 8081 | ✅ Complete | Registration, email/password login, JWT access & refresh tokens, token refresh flow, Google OAuth2 Sign-In (tokeninfo verification), RBAC roles (`CUSTOMER`, `SELLER`, `ADMIN`), Flyway schema (V1/V2), OpenAPI, TestContainers integration tests. |
-| **User Service** | `services/user-service` | 8082 | ✅ Complete | Profiles (`/users/profile`, `/users/me`, `/users/{id}`), Addresses (`/users/me/addresses` CRUD), default address exclusivity, Flyway schema (V1/V2), `ProfileMapper`/`AddressMapper` DTO mappers, parse-only JWT filter, OpenAPI, TestContainers integration tests. |
+| **User Service** | `services/user-service` | 8082 | ✅ Complete | Profiles (`/users/profile`, `/users/me`, `/users/{id}`), Addresses (`/users/me/addresses` CRUD), default address exclusivity, Flyway schema (V1/V2), `ProfileMapper`/`AddressMapper` DTO mappers, shared `libs/common-security` filter, OpenAPI, TestContainers integration tests. |
+| **Product Service** | `services/product-service` | 8083 | ✅ Complete | Product catalog & categories (`/products`), SKU uniqueness, Redis Cache-Aside (`@Cacheable`, `@CacheEvict`), **Decorator Pattern** pricing pipeline (`/products/{id}/price`), Flyway schema (V1), OpenAPI, unit & TestContainers integration tests. |
 
 ---
 
-## 3. Pending & Scaffolded Modules (21 Total)
+## 3. Pending & Scaffolded Modules (18 Total)
 
 All of these directories exist with `.gitkeep` files and module declarations in `settings.gradle.kts`:
 
-- **Platform (2 remaining):** `config-server` (prerequisite), `scheduler`.
-- **Services (12 remaining):** `product-service`, `cart-service`, `order-service`, `payment-service`, `inventory-service`, `shipping-service`, `notification-service`, `review-service`, `search-service`, `recommendation-service`, `analytics-service`, `fraud-service`.
-- **Shared Libraries (6 remaining):** `common-dto`, `common-exceptions`, `common-tracing`, `common-kafka`, `common-security`, `common-testing`.
+- **Platform (1 remaining):** `scheduler`.
+- **Services (11 remaining):** `cart-service`, `order-service`, `payment-service`, `inventory-service`, `shipping-service`, `notification-service`, `review-service`, `search-service`, `recommendation-service`, `analytics-service`, `fraud-service`.
+- **Shared Libraries (6 remaining):** `common-dto`, `common-exceptions`, `common-tracing`, `common-kafka`, `common-testing`.
 
 ---
 

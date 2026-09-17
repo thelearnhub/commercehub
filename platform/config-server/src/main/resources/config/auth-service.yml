@@ -1,0 +1,4 @@
+security:
+  jwt:
+    access-token-ttl-seconds: 900
+    refresh-token-ttl-seconds: 604800

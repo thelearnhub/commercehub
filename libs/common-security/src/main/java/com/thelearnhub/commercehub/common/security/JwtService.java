@@ -1,4 +1,4 @@
-package com.thelearnhub.commercehub.user.security;
+package com.thelearnhub.commercehub.common.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -11,17 +11,15 @@ import javax.crypto.SecretKey;
 import java.util.Optional;
 
 /**
- * Parse-only JWT service — validates tokens issued by Auth Service but never
- * generates them. Uses the same HMAC secret so signature verification works.
- * Once {@code libs/common-security} is extracted, both Auth and User services
- * will share this class instead of each having a copy.
+ * Shared JwtService for downstream microservices.
+ * Validates JWT signatures and parses claims.
  */
 @Service
 public class JwtService {
 
     private final SecretKey signingKey;
 
-    public JwtService(@Value("${security.jwt.secret}") String secret) {
+    public JwtService(@Value("${security.jwt.secret:dev-only-secret-change-me-before-any-real-deployment-32chars+}") String secret) {
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
