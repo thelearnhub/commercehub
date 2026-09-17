@@ -32,6 +32,11 @@ spring:
           predicates:
             - Path=/cart/**
 
+        - id: inventory-service
+          uri: lb://inventory-service
+          predicates:
+            - Path=/inventory/**
+
       globalcors:
         cors-configurations:
           '[/**]':
