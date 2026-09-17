@@ -18,7 +18,7 @@ All frontend requests MUST route through the **API Gateway** on port `8080`.
 | **Payment Service** | 8086 | `/payments/**` | [http://localhost:8086/v3/api-docs](http://localhost:8086/v3/api-docs) | [http://localhost:8086/swagger-ui.html](http://localhost:8086/swagger-ui.html) |
 | **Order Service** | 8087 | `/orders/**` | [http://localhost:8087/v3/api-docs](http://localhost:8087/v3/api-docs) | [http://localhost:8087/swagger-ui.html](http://localhost:8087/swagger-ui.html) |
 | **Shipping Service** | 8088 | `/shipping/**` | [http://localhost:8088/v3/api-docs](http://localhost:8088/v3/api-docs) | [http://localhost:8088/swagger-ui.html](http://localhost:8088/swagger-ui.html) |
-| **Notification Service** | 8089 | `/notifications/**` | [http://localhost:8089/v3/api-docs](http://localhost:8089/v3/api-docs) | [http://localhost:8089/swagger-ui.html](http://localhost:8089/swagger-ui.html) |
+| **Notification Service**| 8089 | `/notifications/**` | [http://localhost:8089/v3/api-docs](http://localhost:8089/v3/api-docs) | [http://localhost:8089/swagger-ui.html](http://localhost:8089/swagger-ui.html) |
 
 ---
 
@@ -86,41 +86,41 @@ All frontend requests MUST route through the **API Gateway** on port `8080`.
 ### 💳 Payment Service (`http://localhost:8080/payments`)
 | Endpoint | Method | Auth | Body / Params | Frontend Status | UI View / Page |
 |---|---|---|---|---|---|
-| `/payments/charge` | `POST` | Bearer | `{ "orderId": "...", "amount": 99.99, "paymentProvider": "STRIPE" }` (Header `Idempotency-Key: <uuid>`) | ⬜ Unconsumed | Checkout Payment Step (`/checkout`) |
-| `/payments/refund` | `POST` | Bearer | `{ "paymentId": "...", "refundAmount": 99.99, "reason": "..." }` | ⬜ Unconsumed | Order Refund Action |
-| `/payments/{id}` | `GET` | Bearer | Path `id` | ⬜ Unconsumed | Payment Receipt Page |
-| `/payments/order/{orderId}` | `GET` | Bearer | Path `orderId` | ⬜ Unconsumed | Order Details Payment Status |
-| `/payments/{id}/audit-logs` | `GET` | ADMIN | Path `id` | ⬜ Unconsumed | Admin Payment Audit Dashboard |
+| `/payments/charge` | `POST` | Bearer | `{ "orderId": "...", "amount": 99.99, "currency": "USD" }` | ✅ Consumed | Seller Portal & Checkout (`/admin`) |
+| `/payments/refund` | `POST` | Bearer | `{ "paymentId": "...", "amount": 99.99, "reason": "..." }` | ✅ Consumed | Seller Portal (`/admin`) |
+| `/payments/{id}` | `GET` | Bearer | Path `id` | ✅ Consumed | Payment Transaction View |
+| `/payments/order/{orderId}` | `GET` | Bearer | Path `orderId` | ✅ Consumed | Payment Order Lookup |
+| `/payments/{id}/audit-logs` | `GET` | Bearer | Path `id` | ✅ Consumed | Payment Audit Logs |
 
 ---
 
-### 📦 Order Service (`http://localhost:8080/orders`)
+### 🛍️ Order Service (`http://localhost:8080/orders`)
 | Endpoint | Method | Auth | Body / Params | Frontend Status | UI View / Page |
 |---|---|---|---|---|---|
-| `/orders/checkout` | `POST` | Bearer | `{ "paymentMethod": "STRIPE", "shippingAddressId": "..." }` | ⬜ Unconsumed | Checkout Page (`/checkout`) |
-| `/orders/me` | `GET` | Bearer | Header `Authorization: Bearer <token>` | ⬜ Unconsumed | Order History (`/orders`) |
-| `/orders/{id}` | `GET` | Bearer | Path `id` | ⬜ Unconsumed | Order Details Page (`/orders/:id`) |
-| `/orders/{id}/cancel` | `POST` | Bearer | `{ "reason": "..." }` | ⬜ Unconsumed | Cancel Order Action |
-| `/orders/{id}/status` | `PUT` | ADMIN | `{ "status": "SHIPPED" }` | ⬜ Unconsumed | Admin Order Management |
-
----
-
-### 🔔 Notification Service (`http://localhost:8080/notifications`)
-| Endpoint | Method | Auth | Body / Params | Frontend Status | UI View / Page |
-|---|---|---|---|---|---|
-| `/notifications/send` | `POST` | Bearer | `{ "channel": "EMAIL", "recipient": "...", "subject": "...", "content": "..." }` | ⬜ Unconsumed | Internal Dispatch / Contact Form |
-| `/notifications/history`| `GET` | Bearer | `?recipient=<email>` | ⬜ Unconsumed | User Notifications Bell |
-| `/notifications/logs` | `GET` | ADMIN | — | ⬜ Unconsumed | Admin Notification Audit |
+| `/orders/checkout` | `POST` | Bearer | `{ "shippingAddress": "...", "items": [...] }` | ✅ Consumed | Cart Checkout Facade CTA |
+| `/orders/me` | `GET` | Bearer | Header `Authorization: Bearer <token>` | ✅ Consumed | My Orders Page (`/orders`) |
+| `/orders/{id}` | `GET` | Bearer | Path `id` | ✅ Consumed | Order Details View |
+| `/orders/{id}/cancel` | `POST` | Bearer | Path `id` | ✅ Consumed | State Machine Cancel Order Action |
+| `/orders/{id}/status` | `PUT` | ADMIN | `{ "status": "SHIPPED" }` | ✅ Consumed | Admin Status Update |
 
 ---
 
 ### 🚚 Shipping Service (`http://localhost:8080/shipping`)
 | Endpoint | Method | Auth | Body / Params | Frontend Status | UI View / Page |
 |---|---|---|---|---|---|
-| `/shipping/shipments` | `POST` | Bearer | `{ "orderId": "...", "carrier": "FEDEX", "shippingAddress": "..." }` | ⬜ Unconsumed | Checkout Shipping Step |
-| `/shipping/shipments/order/{orderId}`| `GET` | Bearer | Path `orderId` | ⬜ Unconsumed | Order Details Delivery Tracker |
-| `/shipping/track/{trackingNumber}` | `GET` | Public | Path `trackingNumber` | ⬜ Unconsumed | Public Tracking Portal (`/track`) |
-| `/shipping/shipments/{id}/status` | `PUT` | ADMIN/CARRIER | `{ "status": "IN_TRANSIT" }` | ⬜ Unconsumed | Carrier Management Portal |
+| `/shipping/shipments` | `POST` | Bearer | `{ "orderId": "...", "recipientName": "...", "streetAddress": "..." }` | ✅ Consumed | Label Creation |
+| `/shipping/shipments/order/{orderId}` | `GET` | Public | Path `orderId` | ✅ Consumed | Shipment Lookup by Order |
+| `/shipping/track/{trackingNumber}` | `GET` | Public | Path `trackingNumber` | ✅ Consumed | Live Package Tracker (`/track`) |
+| `/shipping/shipments/{id}/status` | `PUT` | ADMIN/CARRIER | `{ "status": "IN_TRANSIT" }` | ✅ Consumed | Operations Portal (`/admin`) |
+
+---
+
+### 🔔 Notification Service (`http://localhost:8080/notifications`)
+| Endpoint | Method | Auth | Body / Params | Frontend Status | UI View / Page |
+|---|---|---|---|---|---|
+| `/notifications/send` | `POST` | Bearer | `{ "channel": "EMAIL", "recipient": "...", "content": "..." }` | ✅ Consumed | Notification Center Dispatcher |
+| `/notifications/history` | `GET` | Bearer | `?recipient=...` | ✅ Consumed | Notification Center Popover |
+| `/notifications/logs` | `GET` | ADMIN | — | ✅ Consumed | Admin Notification Audit Logs (`/admin`) |
 
 ---
 
@@ -133,69 +133,34 @@ All frontend requests MUST route through the **API Gateway** on port `8080`.
 - [x] **User Profile & Address Book:** Render `/users/me` profile and `/users/me/addresses` CRUD
 - [x] **Dynamic Price Breakdown:** Call `/products/{id}/price` to show base price, discount, promo code, tax calculation
 - [x] **Admin & Seller Operations:** Create/edit products, stock replenishment, stock release/deduction compensation, & audit log history trail
-- [ ] **Checkout Flow Integration:** Wire `/orders/checkout` $\rightarrow$ `/payments/charge` (with `Idempotency-Key`) $\rightarrow$ `/shipping/shipments/order/{orderId}`
-- [ ] **Notification Center:** Wire Header Bell Icon to `GET /notifications/history`
+- [x] **Order Checkout Facade & Lifecycle:** Initiate checkout, view order history (`/orders`), & State Machine cancellation
+- [x] **Payment Charge & Refund:** Process charges with `Idempotency-Key` headers & issue refunds
+- [x] **Shipment Tracking:** Track shipments by tracking number (`/track`) & update carrier status transitions
+- [x] **Multi-Channel Notifications:** Send & audit `EMAIL`, `SMS`, and `PUSH` notifications in Notification Center
 
 ---
 
-## 4. Frontend Consumption Guidelines (For Frontend Developers & AI Agents)
+## 4. Pre-Seeded Seed Accounts & Sample Catalog Data
 
-> 💡 **Instructions for Frontend Coding Assistants working on `commercehub-web`:**
-
-### 🔔 1. User Notification Bell Component (`GET /notifications/history`)
-- **UI Location:** Top Header bar (Bell Icon with unread counter).
-- **API Call:** `GET http://localhost:8080/notifications/history` (Pass Header: `Authorization: Bearer <token>`).
-- **Data Display:** Displays notification list items with `subject`, `content`, `channel` (`EMAIL`, `SMS`, `PUSH`), and `createdAt` timestamp.
-- **Example Payload:**
-  ```json
-  [
-    {
-      "id": "c1f7b889-1234-4a5b-8c9d-112233445566",
-      "recipient": "user@example.com",
-      "channel": "EMAIL",
-      "subject": "Order ORD-8899 Confirmed!",
-      "content": "Your payment of $199.99 was processed successfully.",
-      "status": "SENT",
-      "createdAt": "2026-09-18T00:50:00Z"
-    }
-  ]
-  ```
-
-### 💳 2. Checkout Payment Step (`POST /payments/charge`)
-- **UI Location:** Checkout Page (`/checkout`).
-- **API Call:** `POST http://localhost:8080/payments/charge`
-- **Required Headers:**
-  - `Authorization: Bearer <accessToken>`
-  - `Idempotency-Key: <generate-uuid-v4>` *(Prevents double charges if user clicks 'Pay' twice or network retries)*
-- **Request Payload:**
-  ```json
-  {
-    "orderId": "ORD-8899",
-    "amount": 199.99,
-    "paymentProvider": "STRIPE"
-  }
-  ```
-
-### 🚚 3. Order Delivery Tracker (`GET /shipping/track/{trackingNumber}`)
-- **UI Location:** Order Details Page (`/orders/:id`) & Public Tracking Portal (`/track`).
-- **API Call:** `GET http://localhost:8080/shipping/track/{trackingNumber}`
-- **Data Display:** Renders progress bar for statuses: `LABEL_CREATED` $\rightarrow$ `IN_TRANSIT` $\rightarrow$ `OUT_FOR_DELIVERY` $\rightarrow$ `DELIVERED`.
-
----
-
-## 5. Gateway Endpoints Summary Table
-
-All endpoints below must be prefixed with `http://localhost:8080`:
-
-| Microservice | Gateway Path | Methods | Consumption Status |
+### 🔑 Pre-Configured Test Accounts (Password: `Password123!`)
+| Role | Email | Name | Default Address |
 |---|---|---|---|
-| **Auth** | `/auth/*` | `POST` | ✅ Consumed in UI |
-| **Users** | `/users/*` | `GET`, `POST`, `PUT`, `DELETE` | ✅ Consumed in UI |
-| **Products** | `/products/*` | `GET`, `POST`, `PUT` | ✅ Consumed in UI |
-| **Cart** | `/cart/*` | `GET`, `POST`, `PUT`, `DELETE` | ✅ Consumed in UI |
-| **Inventory** | `/inventory/*` | `GET`, `POST` | ✅ Consumed in UI |
-| **Payments** | `/payments/*` | `GET`, `POST` | ⬜ Pending UI Wiring |
-| **Orders** | `/orders/*` | `GET`, `POST`, `PUT` | ⬜ Pending UI Wiring |
-| **Shipping** | `/shipping/*` | `GET`, `POST`, `PUT` | ⬜ Pending UI Wiring |
-| **Notifications** | `/notifications/*` | `GET`, `POST` | ⬜ Pending UI Wiring |
+| **ADMIN** | `admin@commercehub.com` | Alex Administrator | 100 Commerce Way, Suite 500, San Francisco, CA |
+| **SELLER** | `seller@commercehub.com` | Sam Seller (TechHub) | 200 Merchant Blvd, Austin, TX |
+| **CUSTOMER** | `customer@commercehub.com` | Charlie Customer | 742 Evergreen Terrace, Springfield, OR |
+| **CUSTOMER** | `john.doe@example.com` | John Doe | 123 Main Street, Apt 4B, New York, NY |
+| **CUSTOMER** | `jane.smith@example.com` | Jane Smith | 456 Oak Avenue, Seattle, WA |
 
+---
+
+### 🛍️ Pre-Configured Sample Products Catalog
+| SKU | Product Name | Category | Base Price | Stock |
+|---|---|---|---|---|
+| `LAP-MBP-16-M3` | MacBook Pro 16" M3 Max | Electronics | $2,499.99 | 50 |
+| `AUD-SONY-XM5-BLK` | Sony WH-1000XM5 Wireless Headphones | Electronics | $399.99 | 120 |
+| `MON-34-UW-144HZ` | Ultra-Wide Curved Gaming Monitor 34" | Electronics | $649.50 | 35 |
+| `SHOE-NIKE-AF1-WHT-10` | Nike Air Force 1 '07 Sneaker | Fashion | $115.00 | 200 |
+| `APP-HD-ORG-BLK-L` | Organic Cotton Oversized Hoodie | Fashion | $78.00 | 85 |
+| `FUR-CHR-ERG-GRY` | Ergonomic Mesh Office Chair | Home & Living | $299.00 | 40 |
+| `KIT-ESP-SMART-SS` | Smart WiFi Espresso Machine | Home & Living | $499.00 | 60 |
+| `BK-DDIA-KLIPP-PB` | Designing Data-Intensive Applications | Books & Media | $45.99 | 150 |
