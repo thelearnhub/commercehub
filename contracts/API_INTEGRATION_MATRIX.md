@@ -133,3 +133,69 @@ All frontend requests MUST route through the **API Gateway** on port `8080`.
 - [x] **User Profile & Address Book:** Render `/users/me` profile and `/users/me/addresses` CRUD
 - [x] **Dynamic Price Breakdown:** Call `/products/{id}/price` to show base price, discount, promo code, tax calculation
 - [x] **Admin & Seller Operations:** Create/edit products, stock replenishment, stock release/deduction compensation, & audit log history trail
+- [ ] **Checkout Flow Integration:** Wire `/orders/checkout` $\rightarrow$ `/payments/charge` (with `Idempotency-Key`) $\rightarrow$ `/shipping/shipments/order/{orderId}`
+- [ ] **Notification Center:** Wire Header Bell Icon to `GET /notifications/history`
+
+---
+
+## 4. Frontend Consumption Guidelines (For Frontend Developers & AI Agents)
+
+> 💡 **Instructions for Frontend Coding Assistants working on `commercehub-web`:**
+
+### 🔔 1. User Notification Bell Component (`GET /notifications/history`)
+- **UI Location:** Top Header bar (Bell Icon with unread counter).
+- **API Call:** `GET http://localhost:8080/notifications/history` (Pass Header: `Authorization: Bearer <token>`).
+- **Data Display:** Displays notification list items with `subject`, `content`, `channel` (`EMAIL`, `SMS`, `PUSH`), and `createdAt` timestamp.
+- **Example Payload:**
+  ```json
+  [
+    {
+      "id": "c1f7b889-1234-4a5b-8c9d-112233445566",
+      "recipient": "user@example.com",
+      "channel": "EMAIL",
+      "subject": "Order ORD-8899 Confirmed!",
+      "content": "Your payment of $199.99 was processed successfully.",
+      "status": "SENT",
+      "createdAt": "2026-09-18T00:50:00Z"
+    }
+  ]
+  ```
+
+### 💳 2. Checkout Payment Step (`POST /payments/charge`)
+- **UI Location:** Checkout Page (`/checkout`).
+- **API Call:** `POST http://localhost:8080/payments/charge`
+- **Required Headers:**
+  - `Authorization: Bearer <accessToken>`
+  - `Idempotency-Key: <generate-uuid-v4>` *(Prevents double charges if user clicks 'Pay' twice or network retries)*
+- **Request Payload:**
+  ```json
+  {
+    "orderId": "ORD-8899",
+    "amount": 199.99,
+    "paymentProvider": "STRIPE"
+  }
+  ```
+
+### 🚚 3. Order Delivery Tracker (`GET /shipping/track/{trackingNumber}`)
+- **UI Location:** Order Details Page (`/orders/:id`) & Public Tracking Portal (`/track`).
+- **API Call:** `GET http://localhost:8080/shipping/track/{trackingNumber}`
+- **Data Display:** Renders progress bar for statuses: `LABEL_CREATED` $\rightarrow$ `IN_TRANSIT` $\rightarrow$ `OUT_FOR_DELIVERY` $\rightarrow$ `DELIVERED`.
+
+---
+
+## 5. Gateway Endpoints Summary Table
+
+All endpoints below must be prefixed with `http://localhost:8080`:
+
+| Microservice | Gateway Path | Methods | Consumption Status |
+|---|---|---|---|
+| **Auth** | `/auth/*` | `POST` | ✅ Consumed in UI |
+| **Users** | `/users/*` | `GET`, `POST`, `PUT`, `DELETE` | ✅ Consumed in UI |
+| **Products** | `/products/*` | `GET`, `POST`, `PUT` | ✅ Consumed in UI |
+| **Cart** | `/cart/*` | `GET`, `POST`, `PUT`, `DELETE` | ✅ Consumed in UI |
+| **Inventory** | `/inventory/*` | `GET`, `POST` | ✅ Consumed in UI |
+| **Payments** | `/payments/*` | `GET`, `POST` | ⬜ Pending UI Wiring |
+| **Orders** | `/orders/*` | `GET`, `POST`, `PUT` | ⬜ Pending UI Wiring |
+| **Shipping** | `/shipping/*` | `GET`, `POST`, `PUT` | ⬜ Pending UI Wiring |
+| **Notifications** | `/notifications/*` | `GET`, `POST` | ⬜ Pending UI Wiring |
+
