@@ -43,20 +43,15 @@ All of these directories exist with `.gitkeep` files and module declarations in 
 
 When taking on the next task, follow this recommended sequence:
 
-1. **Finish Phase 0 Platform:**
-   - Implement `platform/api-gateway` (Spring Cloud Gateway on port 8080) routing to `auth-service`, `user-service`, and Eureka.
-   - Implement `platform/config-server` (Spring Cloud Config).
-   - Complete `infra/docker-compose/docker-compose.yml` (add Redis, Kafka KRaft mode, Schema Registry, Jaeger, Prometheus, Grafana).
-   - Add `.github/workflows/ci.yml` (Gradle build & TestContainers test run on PRs).
+1. **Continue Phase 1 Core Services:**
+   - **`services/cart-service` (Port 8084):** Shopping cart sessions, item management, Redis Write-Through cache + TTL expiry.
+   - **`services/inventory-service` (Port 8085):** Stock reservations, Redis Distributed Lock pattern, audit trails.
+   - **`services/payment-service` (Port 8086):** Charge/refund flows, Factory + Adapter payment providers, Idempotency-Key filter.
+   - **`services/order-service` (Port 8087):** State Machine order lifecycle, Checkout Facade orchestrating Cart/Inventory/Payment/Shipping.
 
-2. **Next Phase 1 Microservice — `services/product-service`:**
-   - Owns product catalog, categories, pricing rules, and inventory lookup stubs.
-   - Stack: MySQL + Redis (cache-aside pattern).
-   - Pattern: Decorator pattern for price calculation pipelines (discounts, taxes, promos).
-   - Schema: Flyway migrations `V1__init_product_schema.sql`.
-
-3. **Extract Shared Libraries:**
-   - Extract shared JWT validation filter and security config from `auth-service`/`user-service` into `libs/common-security`.
+2. **Deferred Infrastructure (To be set up later):**
+   - **Observability Stack (Jaeger, Prometheus, Grafana, Loki):** Deferred until the frontend application (`commercehub-web`) is ready and consuming backend APIs.
+   - **Kafka (KRaft mode) + Schema Registry:** Deferred to Phase 2 (Event-Driven Backbone).
 
 ---
 

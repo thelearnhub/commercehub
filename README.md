@@ -49,7 +49,7 @@ Prerequisites: Docker + Docker Compose, Java 21, Gradle (or Maven).
 docker compose -f infra/docker-compose/docker-compose.yml up -d
 ```
 
-Brings up MySQL, Redis, Kafka (KRaft mode), Schema Registry, Jaeger, Prometheus, Grafana, Loki. (Compose file to be added in Phase 0.)
+Brings up MySQL & Redis. *Note:* Jaeger, Prometheus, Grafana, Loki (Observability Stack) and Kafka will be added to Compose when the frontend application (`commercehub-web`) is ready and starts consuming the APIs.
 
 ## Contributing
 
