@@ -89,4 +89,15 @@ class AuthFlowIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
+
+    @Test
+    void seededDummyUsersCanLoginSuccessfully() {
+        LoginRequest login = new LoginRequest("customer@commercehub.com", "Password123!");
+        ResponseEntity<String> response =
+                restTemplate.postForEntity(baseUrl() + "/auth/login", login, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("accessToken");
+        assertThat(response.getBody()).contains("CUSTOMER");
+    }
 }
