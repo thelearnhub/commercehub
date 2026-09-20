@@ -1,4 +1,4 @@
-package com.thelearnhub.commercehub.user.security;
+package com.thelearnhub.commercehub.common.security;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Validates the Authorization: Bearer &lt;token&gt; header and populates the
- * SecurityContext. Same pattern as Auth Service's filter — will be extracted
- * into libs/common-security once that module is created.
+ * Shared JwtAuthenticationFilter for downstream microservices.
+ * Parses Bearer JWTs and populates the SecurityContext with user identity and authorities.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

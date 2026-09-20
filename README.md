@@ -8,9 +8,19 @@ Part of the [`thelearnhub`](https://github.com/thelearnhub) org. Full plan: [`do
 
 **Phase 0 → Phase 1 Transition.**
 - ✅ **Eureka Server** (`platform/eureka-server`) — Service discovery running on port 8761.
+- ✅ **API Gateway** (`platform/api-gateway`) — Spring Cloud Gateway entry point running on port 8080.
+- ✅ **Config Server** (`platform/config-server`) — Spring Cloud Config Server running on port 8888.
+- ✅ **Common Security Library** (`libs/common-security`) — Shared JWT security validation library.
 - ✅ **Auth Service** (`services/auth-service`) — JWT authentication, RBAC, Google Sign-In, Flyway migrations, port 8081.
 - ✅ **User Service** (`services/user-service`) — User profiles & addresses, Flyway migrations, DTO mapping, port 8082.
-- ⬜ **Next Up:** `api-gateway`, `config-server`, `product-service`.
+- ✅ **Product Service** (`services/product-service`) — Product catalog, Redis Cache-Aside, Decorator pattern pricing engine, port 8083.
+- ✅ **Cart Service** (`services/cart-service`) — Active shopping carts, Write-Through Redis caching, 7-day TTL expiry, port 8084.
+- ✅ **Inventory Service** (`services/inventory-service`) — Stock reservations, Redis Distributed Lock pattern, Audit Trail history, port 8085.
+- ✅ **Payment Service** (`services/payment-service`) — Charge & refund flows, Factory & Adapter patterns, Idempotency-Key filter, port 8086.
+- ✅ **Order Service** (`services/order-service`) — Order lifecycle state machine, Checkout Facade pattern, port 8087.
+- ✅ **Shipping Service** (`services/shipping-service`) — Shipment tracking, Observer pattern, State pattern, port 8088.
+- ✅ **Notification Service** (`services/notification-service`) — Email/SMS/Push notifications, Template Method pattern, port 8089.
+- ⬜ **Phase 1 Core Services COMPLETE!** Next: Phase 2 (Kafka Event-Driven Backbone).
 
 See [`AGENTS.md`](AGENTS.md) for full context for AI assistants working on this repo, and [`docs/CommerceHub_Master_Plan.md`](docs/CommerceHub_Master_Plan.md) for the master engineering roadmap.
 
@@ -45,7 +55,7 @@ Prerequisites: Docker + Docker Compose, Java 21, Gradle (or Maven).
 docker compose -f infra/docker-compose/docker-compose.yml up -d
 ```
 
-Brings up MySQL, Redis, Kafka (KRaft mode), Schema Registry, Jaeger, Prometheus, Grafana, Loki. (Compose file to be added in Phase 0.)
+Brings up MySQL & Redis. *Note:* Jaeger, Prometheus, Grafana, Loki (Observability Stack) and Kafka will be added to Compose when the frontend application (`commercehub-web`) is ready and starts consuming the APIs.
 
 ## Contributing
 

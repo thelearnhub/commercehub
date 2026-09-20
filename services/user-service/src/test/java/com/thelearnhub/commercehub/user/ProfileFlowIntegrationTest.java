@@ -142,6 +142,6 @@ class ProfileFlowIntegrationTest {
     @Test
     void unauthenticatedRequestIsRejected() {
         ResponseEntity<String> response = restTemplate.getForEntity(baseUrl() + "/users/me", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
     }
 }

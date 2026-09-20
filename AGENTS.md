@@ -20,18 +20,28 @@ This document serves as the primary context file for AI coding assistants (Antig
 | Module | Location | Port | Status | Capabilities & Details |
 |---|---|---|---|---|
 | **Eureka Server** | `platform/eureka-server` | 8761 | ✅ Complete | Netflix Eureka Service Discovery server. Services register via `@EnableDiscoveryClient`. |
+| **API Gateway** | `platform/api-gateway` | 8080 | ✅ Complete | Spring Cloud Gateway entry point routing `/auth/**`, `/users/**`, `/products/**` via Eureka load balancing (`lb://`). Global CORS configured. |
+| **Config Server** | `platform/config-server` | 8888 | ✅ Complete | Centralized Spring Cloud Config Server with native profile search locations for microservice configurations. |
+| **Common Security** | `libs/common-security` | — | ✅ Complete | Shared library module providing reusable `JwtService` parse-only validator and `JwtAuthenticationFilter` across downstream microservices. |
 | **Auth Service** | `services/auth-service` | 8081 | ✅ Complete | Registration, email/password login, JWT access & refresh tokens, token refresh flow, Google OAuth2 Sign-In (tokeninfo verification), RBAC roles (`CUSTOMER`, `SELLER`, `ADMIN`), Flyway schema (V1/V2), OpenAPI, TestContainers integration tests. |
-| **User Service** | `services/user-service` | 8082 | ✅ Complete | Profiles (`/users/profile`, `/users/me`, `/users/{id}`), Addresses (`/users/me/addresses` CRUD), default address exclusivity, Flyway schema (V1/V2), `ProfileMapper`/`AddressMapper` DTO mappers, parse-only JWT filter, OpenAPI, TestContainers integration tests. |
+| **User Service** | `services/user-service` | 8082 | ✅ Complete | Profiles (`/users/profile`, `/users/me`, `/users/{id}`), Addresses (`/users/me/addresses` CRUD), default address exclusivity, Flyway schema (V1/V2), `ProfileMapper`/`AddressMapper` DTO mappers, shared `libs/common-security` filter, OpenAPI, TestContainers integration tests. |
+| **Product Service** | `services/product-service` | 8083 | ✅ Complete | Product catalog & categories (`/products`), SKU uniqueness, Redis Cache-Aside (`@Cacheable`, `@CacheEvict`), **Decorator Pattern** pricing pipeline (`/products/{id}/price`), Flyway schema (V1), OpenAPI, unit & TestContainers integration tests. |
+| **Cart Service** | `services/cart-service` | 8084 | ✅ Complete | Active shopping cart sessions (`/cart`), Write-Through Redis session caching (`RedisCartRepository`), automatic 7-day TTL expiry, guest $\rightarrow$ user cart merging, OpenAPI, unit tests. |
+| **Inventory Service** | `services/inventory-service` | 8085 | ✅ Complete | Stock management & reservations (`/inventory`), **Redis Distributed Lock Pattern** (`RedisDistributedLock`), Audit Trail history logging (`InventoryAuditLog`), Flyway schema (V1), OpenAPI, unit tests. |
+| **Payment Service** | `services/payment-service` | 8086 | ✅ Complete | Charge & refund flows (`/payments`), **Factory Pattern** (`PaymentProviderFactory`), **Adapter Pattern** (`PaymentProviderAdapter`), **Idempotency-Key Filter**, Flyway schema (V1), OpenAPI, unit tests. |
+| **Order Service** | `services/order-service` | 8087 | ✅ Complete | Order lifecycle state machine (`/orders`), **Checkout Facade Pattern** (`CheckoutFacade`), **State Machine Pattern** (`OrderStateMachine`), **Builder Pattern**, Flyway schema (V1), OpenAPI, unit tests. |
+| **Shipping Service** | `services/shipping-service` | 8088 | ✅ Complete | Shipment tracking & labels (`/shipping`), **Observer Pattern** (`ShipmentSubject`), **State Pattern** (`ShipmentState`), Flyway schema (V1), OpenAPI, unit tests. |
+| **Notification Service** | `services/notification-service` | 8089 | ✅ Complete | Email/SMS/Push notifications (`/notifications`), **Template Method Pattern** (`AbstractNotificationSender`), Channel Adapters, Flyway schema (V1), OpenAPI, unit tests. |
 
 ---
 
-## 3. Pending & Scaffolded Modules (22 Total)
+## 3. Pending & Scaffolded Modules (12 Total)
 
 All of these directories exist with `.gitkeep` files and module declarations in `settings.gradle.kts`:
 
-- **Platform (2 remaining):** `api-gateway` (prerequisite), `config-server` (prerequisite), `scheduler`.
-- **Services (12 remaining):** `product-service`, `cart-service`, `order-service`, `payment-service`, `inventory-service`, `shipping-service`, `notification-service`, `review-service`, `search-service`, `recommendation-service`, `analytics-service`, `fraud-service`.
-- **Shared Libraries (6 remaining):** `common-dto`, `common-exceptions`, `common-tracing`, `common-kafka`, `common-security`, `common-testing`.
+- **Platform (1 remaining):** `scheduler`.
+- **Services (5 remaining):** `review-service`, `search-service`, `recommendation-service`, `analytics-service`, `fraud-service`.
+- **Shared Libraries (6 remaining):** `common-dto`, `common-exceptions`, `common-tracing`, `common-kafka`, `common-testing`.
 
 ---
 
@@ -39,20 +49,15 @@ All of these directories exist with `.gitkeep` files and module declarations in 
 
 When taking on the next task, follow this recommended sequence:
 
-1. **Finish Phase 0 Platform:**
-   - Implement `platform/api-gateway` (Spring Cloud Gateway on port 8080) routing to `auth-service`, `user-service`, and Eureka.
-   - Implement `platform/config-server` (Spring Cloud Config).
-   - Complete `infra/docker-compose/docker-compose.yml` (add Redis, Kafka KRaft mode, Schema Registry, Jaeger, Prometheus, Grafana).
-   - Add `.github/workflows/ci.yml` (Gradle build & TestContainers test run on PRs).
+1. **Continue Phase 1 Core Services:**
+   - **`services/cart-service` (Port 8084):** Shopping cart sessions, item management, Redis Write-Through cache + TTL expiry.
+   - **`services/inventory-service` (Port 8085):** Stock reservations, Redis Distributed Lock pattern, audit trails.
+   - **`services/payment-service` (Port 8086):** Charge/refund flows, Factory + Adapter payment providers, Idempotency-Key filter.
+   - **`services/order-service` (Port 8087):** State Machine order lifecycle, Checkout Facade orchestrating Cart/Inventory/Payment/Shipping.
 
-2. **Next Phase 1 Microservice — `services/product-service`:**
-   - Owns product catalog, categories, pricing rules, and inventory lookup stubs.
-   - Stack: MySQL + Redis (cache-aside pattern).
-   - Pattern: Decorator pattern for price calculation pipelines (discounts, taxes, promos).
-   - Schema: Flyway migrations `V1__init_product_schema.sql`.
-
-3. **Extract Shared Libraries:**
-   - Extract shared JWT validation filter and security config from `auth-service`/`user-service` into `libs/common-security`.
+2. **Deferred Infrastructure (To be set up later):**
+   - **Observability Stack (Jaeger, Prometheus, Grafana, Loki):** Deferred until the frontend application (`commercehub-web`) is ready and consuming backend APIs.
+   - **Kafka (KRaft mode) + Schema Registry:** Deferred to Phase 2 (Event-Driven Backbone).
 
 ---
 
